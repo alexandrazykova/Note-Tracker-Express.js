@@ -2,6 +2,7 @@
 const express = require('express');
 // Import built-in Node.js package 'path'
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 const notes = require('./db/db.json');
 const fs = require('fs');
@@ -10,7 +11,7 @@ const PORT = process.env.port || 3001;
 const app = express();
 
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // GET Route for home page
@@ -30,7 +31,10 @@ app.get('/api/notes', (req, res) => {
 
 // POST request for api/notes
 app.post('/api/notes', (req, res) => {
-    notes.push(req.body);
+
+    //const { title, text } = req.body;
+
+    notes.push({ id:"myid", ...req.body});
     fs.writeFile('./db/db.json', JSON.stringify(notes), err => {
         if (err) {
             console.error(err);
@@ -45,5 +49,5 @@ app.get('*', (req, res) =>
 );
 
 app.listen(PORT, () => {
-  console.log(`App listening at http://localhost:${PORT}`);
+    console.log(`App listening at http://localhost:${PORT}`);
 });
