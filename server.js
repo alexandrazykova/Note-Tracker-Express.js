@@ -2,7 +2,10 @@
 const express = require('express');
 // Import built-in Node.js package 'path'
 const path = require('path');
+// Helper method for generating unique ids
 const { v4: uuidv4 } = require('uuid');
+const uuid = require('./helpers/uuid');
+
 
 const notes = require('./db/db.json');
 const fs = require('fs');
@@ -26,22 +29,22 @@ app.get('/notes', (req, res) =>
 
 // GET request for api/notes
 app.get('/api/notes', (req, res) => {
-    res.json(notes)
-});
+    res.sendFile(path.join(__dirname, 'db/db.json'));
+  });
 
 // POST request for api/notes
 app.post('/api/notes', (req, res) => {
+    const note = JSON.parse(fs.readFileSync("./db/db.json"));
+    const newNote = req.body;
+    newNote.id = uuid();
+    note.push(newNote);
+    const noteString = JSON.stringify(note);
 
-    //const { title, text } = req.body;
-
-    notes.push({ id:"myid", ...req.body});
-    fs.writeFile('./db/db.json', JSON.stringify(notes), err => {
-        if (err) {
-            console.error(err);
-        }
+    fs.writeFile('./db/db.json', noteString, err => {
+      if (err) throw err;
+      res.json(note);
     });
-    res.send(notes)
-});
+  });
 
 // GET request for other 
 app.get('*', (req, res) =>
