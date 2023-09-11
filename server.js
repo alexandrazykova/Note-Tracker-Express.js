@@ -23,6 +23,22 @@ app.get('/notes', (req, res) =>
     res.sendFile(path.join(__dirname, '/public/notes.html'))
 );
 
+// GET request for api/notes
+app.get('/api/notes', (req, res) => {
+    res.json(notes)
+});
+
+// POST request for api/notes
+app.post('/api/notes', (req, res) => {
+    notes.push(req.body);
+    fs.writeFile('./db/db.json', JSON.stringify(notes), err => {
+        if (err) {
+            console.error(err);
+        }
+    });
+    res.send(notes)
+});
+
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`);
 });
