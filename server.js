@@ -30,7 +30,7 @@ app.get('/notes', (req, res) =>
 // GET request for api/notes
 app.get('/api/notes', (req, res) => {
     res.sendFile(path.join(__dirname, 'db/db.json'));
-  });
+});
 
 // POST request for api/notes
 app.post('/api/notes', (req, res) => {
@@ -41,10 +41,24 @@ app.post('/api/notes', (req, res) => {
     const noteString = JSON.stringify(note);
 
     fs.writeFile('./db/db.json', noteString, err => {
-      if (err) throw err;
-      res.json(note);
+        if (err) throw err;
+        res.json(note);
     });
-  });
+});
+
+// Deleting notes
+app.delete("/api/notes/:id", (req, res) => {
+    const note = JSON.parse(fs.readFileSync("./db/db.json"));
+    console.log("Note: ", note);
+    const deleteNote = note.filter((note) => note.id !== req.params.id);
+    const noteString = JSON.stringify(deleteNote);
+    
+    fs.writeFileSync('./db/db.json', noteString, err => {
+        res.json(err);
+    });
+    res.json(note);
+});
+
 
 // GET request for other 
 app.get('*', (req, res) =>
